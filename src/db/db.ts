@@ -1,9 +1,11 @@
 // src/config/db.ts
 import mongoose from 'mongoose';
-const { mongoURI } = require('../config/keys');
+import dotenv from 'dotenv'
+const mongoUri: string = process.env.MONGO_URI as string;
+
 const connectDB = async () => {
   try {
-    await mongoose.connect(mongoURI);
+    await mongoose.connect(mongoUri);
     console.log('MongoDB Connected');
   } catch (err) {
     console.error('MongoDB Connection Error: ', err);
