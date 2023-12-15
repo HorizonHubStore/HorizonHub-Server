@@ -9,7 +9,9 @@ router.post('/signup', authController.signup);
 
 router.post('/login', authController.login);
 
-router.post('/logout', authController.logout);
+router.post('/logout',authenticate, authController.logout);
+
+router.post('/refreashToken',authController.refreashToken)
 
 router.get('/dashboard', authenticate, authController.dashboard);
 

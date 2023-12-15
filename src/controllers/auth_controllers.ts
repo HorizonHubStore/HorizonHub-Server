@@ -1,8 +1,16 @@
 // src/controllers/authController.ts
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import User from "../models/user_module";
+interface UserInfo {
+    _id: string; // Update with your actual user ID type
+    // Add other properties based on your user model
+}
+
+const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
+const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
+const refreashTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
 
 async function signup(req: Request, res: Response) {
     try {
@@ -33,9 +41,8 @@ async function signup(req: Request, res: Response) {
 }
 
 async function login(req: Request, res: Response) {
-    const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
-    const jwtTokenExpiration: string = process.env
-        .JWT_TOKEN_EXPIRATION as string;
+    
+
     try {
         const { username, password } = req.body;
 
@@ -50,18 +57,76 @@ async function login(req: Request, res: Response) {
             return res.status(401).json({ message: "Invalid credentials" });
 
         // Generate a JWT token upon successful login
-        const token = jwt.sign({ _id: user._id }, accessTokenSecret, {
+        const AccessToken = jwt.sign({ _id: user._id }, accessTokenSecret, {
             expiresIn: jwtTokenExpiration,
         });
 
+        const refreashToken = jwt.sign({ _id: user._id }, refreashTokenSecret);
+
+        if (user.tokens == null) user.tokens = [refreashToken];
+        else user.tokens.push(refreashToken);
+        await user.save();
         // Return the token as { token }
-        res.json({ token });
+        res.status(200).send({
+            accessToken: AccessToken,
+            refreshToken: refreashToken,
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+async function refreashToken(req: Request, res: Response, next: NextFunction) {
+    const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
+    const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
+    const refreashTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
+    
+    const authHeaders = req.headers['authorization'];
+    const token = authHeaders && authHeaders.split(' ')[1];
 
+    if (token == null) {
+        return res.sendStatus(401); // Unauthorized
+    }
+
+    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+        if (err) {
+            return res.status(403).send(err.message);
+        }
+
+        try {
+            if (!userInfo || typeof userInfo === 'string') {
+                throw new Error('Invalid user information'); // or handle it differently
+            }
+
+            const user = await User.findById((userInfo as JwtPayload)._id);
+
+            if (!user?.tokens) {
+                throw new Error('User tokens not available'); // or handle it differently
+            }
+
+            if (!user.tokens.includes(token)) {
+                //@ts-ignore
+                user.tokens = [];
+                await user?.save();
+                return res.status(403).send('Invalid request');
+            }
+
+            const AccessToken = jwt.sign({ _id: user?._id }, accessTokenSecret, {
+                expiresIn: jwtTokenExpiration,
+            });
+
+            const refreashToken = jwt.sign({ _id: user?._id }, refreashTokenSecret);
+            user.tokens[user.tokens.indexOf(token)] = refreashToken;
+            await user?.save();
+            res.status(200).send({
+                accessToken: AccessToken,
+                refreshToken: refreashToken,
+            });
+        } catch (err) {
+            return res.status(403).send(err);
+        }
+    });
+}
 async function logout(req: Request, res: Response) {
     // Perform any logout-related actions (e.g., token blacklist)
     res.json({ message: "Logged out successfully" });
@@ -71,4 +136,4 @@ async function dashboard(req: Request, res: Response) {
     res.json({ message: "Welcome to the dashboard", user: req.body.user });
 }
 
-export { signup, login, logout, dashboard };
+export { signup, login, logout,refreashToken, dashboard };
