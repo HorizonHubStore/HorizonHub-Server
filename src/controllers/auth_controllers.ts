@@ -41,8 +41,6 @@ async function signup(req: Request, res: Response) {
 }
 
 async function login(req: Request, res: Response) {
-    
-
     try {
         const { username, password } = req.body;
 
@@ -78,11 +76,13 @@ async function login(req: Request, res: Response) {
 }
 async function refreashToken(req: Request, res: Response, next: NextFunction) {
     const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
-    const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
-    const refreashTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
-    
-    const authHeaders = req.headers['authorization'];
-    const token = authHeaders && authHeaders.split(' ')[1];
+    const jwtTokenExpiration: string = process.env
+        .JWT_TOKEN_EXPIRATION as string;
+    const refreashTokenSecret: string = process.env
+        .REFRESH_TOKEN_SECRET as string;
+
+    const authHeaders = req.headers["authorization"];
+    const token = authHeaders && authHeaders.split(" ")[1];
 
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
@@ -94,28 +94,31 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
         }
 
         try {
-            if (!userInfo || typeof userInfo === 'string') {
-                throw new Error('Invalid user information'); // or handle it differently
-            }
-
             const user = await User.findById((userInfo as JwtPayload)._id);
 
             if (!user?.tokens) {
-                throw new Error('User tokens not available'); // or handle it differently
+                throw new Error("User tokens not available"); // or handle it differently
             }
 
             if (!user.tokens.includes(token)) {
                 //@ts-ignore
                 user.tokens = [];
                 await user?.save();
-                return res.status(403).send('Invalid request');
+                return res.status(403).send("Invalid request");
             }
 
-            const AccessToken = jwt.sign({ _id: user?._id }, accessTokenSecret, {
-                expiresIn: jwtTokenExpiration,
-            });
+            const AccessToken = jwt.sign(
+                { _id: user?._id },
+                accessTokenSecret,
+                {
+                    expiresIn: jwtTokenExpiration,
+                }
+            );
 
-            const refreashToken = jwt.sign({ _id: user?._id }, refreashTokenSecret);
+            const refreashToken = jwt.sign(
+                { _id: user?._id },
+                refreashTokenSecret
+            );
             user.tokens[user.tokens.indexOf(token)] = refreashToken;
             await user?.save();
             res.status(200).send({
@@ -127,8 +130,38 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
         }
     });
 }
+
 async function logout(req: Request, res: Response) {
-    // Perform any logout-related actions (e.g., token blacklist)
+    const authHeaders = req.headers["authorization"];
+    const token = authHeaders && authHeaders.split(" ")[1];
+
+    if (token == null) {
+        return res.sendStatus(401); // Unauthorized
+    }
+
+    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+        if (err) {
+            return res.status(403).send(err.message);
+        }
+        const user = await User.findById((userInfo as JwtPayload)._id);
+        try {
+            if (!user?.tokens) {
+                throw new Error("User tokens not available"); // or handle it differently
+            }
+
+            if (!user.tokens.includes(token)) {
+                //@ts-ignore
+                user.tokens = [];
+                await user?.save();
+                return res.status(403).send("Invalid request");
+            }
+            user.tokens.splice(user.tokens.indexOf(token), 1);
+            await user?.save();
+            res.status(200).send({});
+        } catch (err) {
+            return res.status(403).send(err);
+        }
+    });
     res.json({ message: "Logged out successfully" });
 }
 
@@ -136,4 +169,4 @@ async function dashboard(req: Request, res: Response) {
     res.json({ message: "Welcome to the dashboard", user: req.body.user });
 }
 
-export { signup, login, logout,refreashToken, dashboard };
+export { signup, login, logout, refreashToken, dashboard };
