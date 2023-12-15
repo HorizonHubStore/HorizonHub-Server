@@ -1,6 +1,6 @@
 // src/app.ts
 import express from 'express';
-import {connectDB} from './db/db';
+import {connectDB,closeDB} from './db/db';
 import authRouter from './routes/auth_routes'
 
 const app = express();
@@ -18,6 +18,16 @@ export const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Closing server and MongoDB connection...');
+  server.close(() => {
+    closeDB().finally(() => {
+      console.log('Server and MongoDB connection closed.');
+      process.exit(0);
+    });
+  });
+});
 
 
 export default app;
