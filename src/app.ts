@@ -1,6 +1,7 @@
 // src/app.ts
 import express from 'express';
 import connectDB from './db/db';
+import authRouter from './routes/auth_routes'
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -10,6 +11,7 @@ connectDB();
 
 // Middleware
 app.use(express.json());
+app.use('/auth',authRouter)
 
 // Start server
 app.listen(PORT, () => {
