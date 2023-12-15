@@ -114,7 +114,7 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
             await user?.save();
             res.status(200).send({
                 accessToken: AccessToken,
-                refreshToken: refreashToken,
+                refreashToken: refreashToken,
             });
         } catch (err) {
             return res.status(403).send(err);
@@ -124,8 +124,9 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
 
 async function logout(req: Request, res: Response) {
     const authHeaders = req.headers["authorization"];
-    const token = authHeaders && authHeaders.split(" ")[1];
-
+    const token = authHeaders && authHeaders.split(" ")[2];
+    console.log(token);
+    
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
     }
@@ -135,6 +136,7 @@ async function logout(req: Request, res: Response) {
             return res.status(403).send(err.message);
         }
         const user = await User.findById((userInfo as JwtPayload)._id);
+
         try {
             if (!user?.tokens) {
                 throw new Error("User tokens not available"); // or handle it differently
@@ -143,14 +145,16 @@ async function logout(req: Request, res: Response) {
             if (!user.tokens.includes(token)) {
                 //@ts-ignore
                 user.tokens = [];
-                await user?.save();
+                await user.save();
                 return res.status(403).send("Invalid request");
             }
             user.tokens.splice(user.tokens.indexOf(token), 1);
-            await user?.save();
-            res.status(200).send({});
+            await user.save();
+            console.log("gg");
+
+            res.status(200).send();
         } catch (err) {
-            return res.status(403).send(err);
+            return res.status(403).send();
         }
     });
     res.json({ message: "Logged out successfully" });

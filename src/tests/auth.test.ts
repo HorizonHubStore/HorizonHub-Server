@@ -11,13 +11,11 @@ const userName = "estUserName";
 const userPassword = "testUserPassword";
 
 beforeAll(async () => {
-    // Connect to MongoDB before running tests
-    await connectDB();
-
     // Delete the user before running tests
     await User.deleteOne({ username: userName });
 });
 
+// Sign up test
 describe("Sign Up", () => {
     it("Add new user", async () => {
         const res = await request(app).post("/auth/signup").send({
@@ -29,23 +27,63 @@ describe("Sign Up", () => {
     });
 });
 
+
+//Log in test
+let accessToken = "";
+let refreashToken = "";
 describe("Login", () => {
     it("Login user", async () => {
-        const res = await request(app).post('/auth/login').send({
+        const res = await request(app).post("/auth/login").send({
             username: userName,
             password: userPassword,
-        })
-        expect(res.statusCode).toEqual(200)
-        const accessToken = res.body.accessToken
-        const refreashToken = res.body.refreashToken
-        
-        expect(accessToken).not.toEqual(null || undefined)
-        expect(refreashToken).not.toEqual(null || undefined)
+        });
+        expect(res.statusCode).toEqual(200);
+        accessToken = res.body.accessToken;
+        refreashToken = res.body.refreashToken;
 
+        expect(accessToken).not.toEqual(null || undefined);
+        expect(refreashToken).not.toEqual(null || undefined);
     });
 });
 
-describe("Authentication Endpoints", () => {
+
+//Token Access and Resfreash tests
+let newAccessToken = "";
+let newRefreashToken = "";
+jest.setTimeout(30000);
+describe("Token access", () => {
+    it("timeout access", async () => {
+        await new Promise((r) => setTimeout(r, 3 * 1000));
+        const res = await request(app)
+            .get("/auth/dashboard")
+            .set({ authorization: "JWT " + accessToken });
+        expect(res.statusCode).not.toEqual(200);
+    });
+
+    it("Refreash token", async () => {
+        const res = await request(app)
+            .get("/auth/refreashToken")
+            .set({ authorization: "JWT " + refreashToken });
+        expect(res.statusCode).toEqual(200);
+        newAccessToken = res.body.accessToken;
+        newRefreashToken = res.body.refreashToken;
+        expect(newAccessToken).not.toEqual(null || undefined);
+        expect(newRefreashToken).not.toEqual(null || undefined);
+    });
+});
+
+
+// Log out tests
+describe("Log out", () => {
+    it("should logout with authentication", async () => {
+        const response = await request(app)
+            .post("/auth/logout")
+            .set({
+                authorization: "JWT " + newAccessToken + " " + newRefreashToken,
+            });
+        expect(response.statusCode).toEqual(200);
+    });
+
     it("should not logout without authentication", async () => {
         const response = await request(app).post("/auth/logout").send();
 
