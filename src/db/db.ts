@@ -1,6 +1,7 @@
 // src/config/db.ts
 import mongoose from 'mongoose';
 import dotenv from 'dotenv'
+dotenv.config()
 const mongoUri: string = process.env.MONGO_URI as string;
 
 const connectDB = async () => {
@@ -13,4 +14,12 @@ const connectDB = async () => {
   }
 };
 
-export default connectDB;
+const closeDB = async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('MongoDB Connection Closed');
+  } catch (err) {
+    console.error('Error closing MongoDB connection: ', err);
+  }
+};
+export  {closeDB,connectDB};

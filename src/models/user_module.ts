@@ -4,7 +4,7 @@ interface IUser extends Document {
     username: string;
     password: string;
     fullName: string;
-    tokens: [any];
+    tokens: [String];
 }
 
 const userSchema = new Schema<IUser>({

@@ -3,10 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import User from "../models/user_module";
-interface UserInfo {
-    _id: string; // Update with your actual user ID type
-    // Add other properties based on your user model
-}
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
@@ -26,14 +22,15 @@ async function signup(req: Request, res: Response) {
 
         // Create a new user in the database
         const newUser = new User({
-            username,
+            username: username,
             password: hashedPassword,
-            fullName,
+            fullName: fullName,
         });
+
         await newUser.save();
 
         // Return a success message
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(200).json({ message: "User registered successfully" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -67,7 +64,7 @@ async function login(req: Request, res: Response) {
         // Return the token as { token }
         res.status(200).send({
             accessToken: AccessToken,
-            refreshToken: refreashToken,
+            refreashToken: refreashToken,
         });
     } catch (error) {
         console.error(error);
@@ -75,12 +72,6 @@ async function login(req: Request, res: Response) {
     }
 }
 async function refreashToken(req: Request, res: Response, next: NextFunction) {
-    const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
-    const jwtTokenExpiration: string = process.env
-        .JWT_TOKEN_EXPIRATION as string;
-    const refreashTokenSecret: string = process.env
-        .REFRESH_TOKEN_SECRET as string;
-
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[1];
 
@@ -97,7 +88,7 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
             const user = await User.findById((userInfo as JwtPayload)._id);
 
             if (!user?.tokens) {
-                throw new Error("User tokens not available"); // or handle it differently
+                throw new Error("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {
