@@ -65,6 +65,7 @@ async function login(req: Request, res: Response) {
         res.status(200).send({
             accessToken: AccessToken,
             refreashToken: refreashToken,
+            userData:user
         });
     } catch (error) {
         console.error(error);
@@ -125,7 +126,6 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
 async function logout(req: Request, res: Response) {
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[2];
-    console.log(token);
     
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
@@ -150,8 +150,6 @@ async function logout(req: Request, res: Response) {
             }
             user.tokens.splice(user.tokens.indexOf(token), 1);
             await user.save();
-            console.log("gg");
-
             res.status(200).send();
         } catch (err) {
             return res.status(403).send();
