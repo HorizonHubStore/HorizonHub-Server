@@ -1,5 +1,4 @@
-import express from 'express';
-import { Router } from 'express';
+import express, {Router} from 'express';
 import authenticate from '../middleware/auth';
 import * as authController from '../controllers/auth_controllers';
 
@@ -9,9 +8,9 @@ router.post('/signup', authController.signup);
 
 router.post('/login', authController.login);
 
-router.post('/logout',authenticate, authController.logout);
+router.post('/logout', authenticate, authController.logout);
 
-router.get('/refreashToken',authController.refreashToken)
+router.get('/refreashToken', authController.refreashToken)
 
 router.get('/dashboard', authenticate, authController.dashboard);
 

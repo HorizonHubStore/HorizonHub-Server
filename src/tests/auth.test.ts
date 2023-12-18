@@ -1,18 +1,18 @@
 // auth.test.ts
 
 import request from "supertest";
-import app from "../app";
-import { server } from "../app";
+import app, {server} from "../app";
 
-import { connectDB, closeDB } from "../db/db";
+import {closeDB} from "../db/db";
 import User from "../models/user_module";
+
 const fullname = "estFudlName";
 const userName = "estUserName";
 const userPassword = "testUserPassword";
 
 beforeAll(async () => {
     // Delete the user before running tests
-    await User.deleteOne({ username: userName });
+    await User.deleteOne({username: userName});
 });
 
 // Sign up test
@@ -56,14 +56,14 @@ describe("Token access", () => {
         await new Promise((r) => setTimeout(r, 3 * 1000));
         const res = await request(app)
             .get("/auth/dashboard")
-            .set({ authorization: "JWT " + accessToken });
+            .set({authorization: "JWT " + accessToken});
         expect(res.statusCode).not.toEqual(200);
     });
 
     it("Refreash token", async () => {
         const res = await request(app)
             .get("/auth/refreashToken")
-            .set({ authorization: "JWT " + refreashToken });
+            .set({authorization: "JWT " + refreashToken});
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
         newRefreashToken = res.body.refreashToken;
@@ -95,7 +95,7 @@ describe("Log out", () => {
 afterAll(async () => {
     try {
         // Delete the user after running tests
-        await User.deleteOne({ username: userName });
+        await User.deleteOne({username: userName});
 
         // Close the MongoDB connection after all tests
         await closeDB();
