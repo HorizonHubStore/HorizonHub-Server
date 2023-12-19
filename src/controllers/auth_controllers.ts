@@ -73,6 +73,47 @@ async function login(req: Request, res: Response) {
     }
 }
 
+async function googleLogin(req: Request, res: Response) {
+    console.log("Entered Google login");
+    
+    try {
+        const {credentials} = req.body;
+        // Check if the user exists
+        let user = await User.findOne({username:credentials.email});
+        if (!user){
+            const hashedPassword = await bcrypt.hash("placeHolder", 10);
+            const newUser = new User({
+                username: credentials.email,
+                password: hashedPassword,
+                fullName: credentials.name,
+            });
+            console.log("Created user successfuly");
+            user = await newUser.save();
+            console.log(user);
+        }
+
+        // Generate a JWT token upon successful login
+        const AccessToken = jwt.sign({_id: user._id}, accessTokenSecret, {
+            expiresIn: jwtTokenExpiration,
+        });
+
+        const refreashToken = jwt.sign({_id: user._id}, refreashTokenSecret);
+
+        if (user.tokens == null) user.tokens = [refreashToken];
+        else user.tokens.push(refreashToken);
+        await user.save();
+        // Return the token as { token }
+        res.status(200).send({
+            accessToken: AccessToken,
+            refreashToken: refreashToken,
+            userData: user
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Internal Server Error"});
+    }
+}
+
 async function refreashToken(req: Request, res: Response, next: NextFunction) {
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[1];
@@ -163,4 +204,4 @@ async function dashboard(req: Request, res: Response) {
     res.json({message: "Welcome to the dashboard", user: req.body.user});
 }
 
-export {signup, login, logout, refreashToken, dashboard};
+export {signup, login,googleLogin, logout, refreashToken, dashboard};
