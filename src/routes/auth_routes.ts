@@ -8,6 +8,8 @@ router.post('/signup', authController.signup);
 
 router.post('/login', authController.login);
 
+router.post('/googleLogin', authController.googleLogin);
+
 router.post('/logout', authenticate, authController.logout);
 
 router.get('/refreashToken', authController.refreashToken)
