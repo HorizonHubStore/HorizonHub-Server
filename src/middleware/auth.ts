@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import {NextFunction, Request, Response} from "express";
 import jwt from "jsonwebtoken";
 
 const authenticate = async (
@@ -9,7 +9,7 @@ const authenticate = async (
     try {
         const authHeaders = req.headers["authorization"];
         const token = authHeaders && authHeaders.split(" ")[1];
-        
+
         if (token == null) {
             return res.sendStatus(401); // Unauthorized
         }

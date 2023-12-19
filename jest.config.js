@@ -5,10 +5,8 @@ module.exports = {
     moduleNameMapper: {
       '^@/(.*)$': '<rootDir>/src/$1',
     },
-    globals: {
-      'ts-jest': {
-        tsconfig: 'tsconfig.json',
-      },
+    transform: {
+        '^.+\\.tsx?$': 'ts-jest',
     },
   };
   
