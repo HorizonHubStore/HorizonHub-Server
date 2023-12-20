@@ -2,7 +2,8 @@
 import {NextFunction, Request, Response} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import User from "../models/user_module";
+import User from "../models/userModule";
+import { saveUserProfilePicture } from "./userController";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
@@ -74,22 +75,21 @@ async function login(req: Request, res: Response) {
 }
 
 async function googleLogin(req: Request, res: Response) {
-    console.log("Entered Google login");
-    
     try {
         const {credentials} = req.body;
         // Check if the user exists
         let user = await User.findOne({username:credentials.email});
+        
         if (!user){
+            saveUserProfilePicture({pictureUrl:credentials.picture,username:credentials.email})
             const hashedPassword = await bcrypt.hash("placeHolder", 10);
             const newUser = new User({
                 username: credentials.email,
                 password: hashedPassword,
                 fullName: credentials.name,
+                picture: 'images/'+credentials.email+".jpg"
             });
-            console.log("Created user successfuly");
             user = await newUser.save();
-            console.log(user);
         }
 
         // Generate a JWT token upon successful login
@@ -113,6 +113,8 @@ async function googleLogin(req: Request, res: Response) {
         res.status(500).json({message: "Internal Server Error"});
     }
 }
+
+
 
 async function refreashToken(req: Request, res: Response, next: NextFunction) {
     const authHeaders = req.headers["authorization"];
