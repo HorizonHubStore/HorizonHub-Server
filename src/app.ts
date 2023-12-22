@@ -1,8 +1,10 @@
 // src/app.ts
 import express from 'express';
 import {closeDB, connectDB} from './db/db';
-import authRouter from './routes/auth_routes'
+import authRouter from './routes/authRoutes'
+import userRouter from './routes/userRoutes'
 import cors from 'cors'
+import path from 'path'
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,7 +20,12 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+
+app.use('/images', express.static(path.join(process.cwd(), 'public', 'images')));
+
+
 app.use('/auth', authRouter)
+app.use('/user', userRouter)
 
 // Start server
 export const server = app.listen(PORT, () => {
