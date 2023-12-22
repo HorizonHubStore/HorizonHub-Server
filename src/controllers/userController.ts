@@ -43,44 +43,49 @@ async function saveUserProfilePicture(profile: {
 
 async function updateUserPicture(userId: string, newPicturePath: string) {
     try {
-      // Retrieve the current user's data to get the old picture path
-      const currentUser = await User.findById(userId);
-  
-      if (!currentUser) {
-        console.error("User not found");
-        return;
-      }
-  
-      const oldPicturePath = path.join('public', currentUser.picture);
-      // Delete the old file from the server
-      if (oldPicturePath) {
-        try {
-          await fs.unlink(oldPicturePath, (deleteError) => {
-            if (deleteError) {
-              console.error("Error deleting old file:", deleteError);
-            } else {
-              console.log("Old file deleted successfully");
-            }
-          });
-        } catch (deleteError) {
-          console.error("Error deleting old file:", deleteError);
+        // Retrieve the current user's data to get the old picture path
+        const currentUser = await User.findById(userId);
+
+        if (!currentUser) {
+            console.error("User not found");
+            return;
         }
-      }
-  
-      // Update the user's picture path in the database
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: { picture: newPicturePath } },
-        { new: true }
-      );
-  
-      if (!updatedUser) {
-        console.error("User not found");
-      } else {
-        console.log("User picture updated successfully");
-      }
+
+        const oldPicturePath = path.join("public", currentUser.picture);
+        
+
+        // Delete the old file from the server
+        if (
+            oldPicturePath &&
+            !oldPicturePath.includes("default-user-profile.jpg")
+        ) {
+            try {
+                await fs.unlink(oldPicturePath, (deleteError) => {
+                    if (deleteError) {
+                        console.error("Error deleting old file:", deleteError);
+                    } else {
+                        console.log("Old file deleted successfully");
+                    }
+                });
+            } catch (deleteError) {
+                console.error("Error deleting old file:", deleteError);
+            }
+        }
+
+        // Update the user's picture path in the database
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: { picture: newPicturePath } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            console.error("User not found");
+        } else {
+            console.log("User picture updated successfully");
+        }
     } catch (error) {
-      console.error("Error updating user picture in the database:", error);
+        console.error("Error updating user picture in the database:", error);
     }
-  }
+}
 export { saveUserProfilePicture, updateUserPicture };
