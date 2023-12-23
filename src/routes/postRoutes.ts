@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
   });
 
 const upload = multer({ storage: storage });
+
 // Post routes
 router.post("/createPost", authenticate, upload.fields([
     { name: 'picture', maxCount: 1 },

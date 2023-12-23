@@ -1,9 +1,10 @@
 // userRoutes.js
 const express = require("express");
 const router = express.Router();
+import * as userController from "../controllers/userController";
+
 import multer from 'multer'
 import path from 'path'
-import * as FileController from "../controllers/fileController";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -18,6 +19,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 // Define routes
-router.put("/updatePicture",FileController.uploadPicture);
+router.put("/updatePicture",upload.single('file'),userController.updateUserPicture);
 
 export default router;
