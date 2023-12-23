@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 const authenticate = async (
@@ -20,8 +20,6 @@ const authenticate = async (
                 return res.status(403).send(err.message);
             }
 
-            // @ts-ignore
-            req.user = user;
             next();
         });
     } catch (error) {

@@ -15,8 +15,6 @@ export const updateUserPicture = async(req: Request, res: Response) => {
         // Construct the file paths
         const picturePath = `images/${pictureName}`;
         const currentUser = await User.findById(userId);
-        console.log(picturePath);
-        
 
         if (!currentUser) {
             console.error("User not found");
@@ -64,4 +62,8 @@ export const updateUserPicture = async(req: Request, res: Response) => {
         console.error("Error updating user picture in the database:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
+}
+
+export const getUserData = async(req: Request, res: Response) => {
+    
 }

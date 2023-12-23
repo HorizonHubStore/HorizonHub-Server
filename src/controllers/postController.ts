@@ -4,7 +4,7 @@ import Post, { IPost } from "../models/postModule";
 
 export const createPost = async (req: Request, res: Response) => {
   try {
-    console.log(req.files);
+    console.log(req.body);
         
     // Extract data from the request body
     const { name, creatorName } = req.body;

@@ -3,7 +3,6 @@ import {NextFunction, Request, Response} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import User from "../models/userModule";
-import { saveUserProfilePicture } from "./userController";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
@@ -81,13 +80,11 @@ async function googleLogin(req: Request, res: Response) {
         let user = await User.findOne({username:credentials.email});
         
         if (!user){
-            saveUserProfilePicture({pictureUrl:credentials.picture,username:credentials.email})
             const hashedPassword = await bcrypt.hash("placeHolder", 10);
             const newUser = new User({
                 username: credentials.email,
                 password: hashedPassword,
                 fullName: credentials.name,
-                picture: 'images/'+credentials.email+".jpg"
             });
             user = await newUser.save();
         }
