@@ -35,6 +35,7 @@ const handleFileUpload = async (
 export const uploadPicture = async (req: Request, res: Response) => {
   try {
     const fileData = req.body?.file;
+    
 
     if (!fileData) {
       return res.status(400).json({ message: 'No file uploaded' });
