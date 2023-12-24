@@ -6,100 +6,103 @@ import * as path from "path";
 import * as fs from "fs";
 
 export const createPost = async (req: Request, res: Response) => {
-  try {
-    console.log(req.body);
+    try {
+        console.log(req.body);
+
+        // Extract data from the request body
+        const { name, creatorUserId, creatorName } = req.body;
+
+        // Extract file information from req.files
+        const picture: Express.Multer.File = (req.files as any)["picture"][0];
+        const gameFile: Express.Multer.File = (req.files as any)["gameFile"][0];
+
+        // Construct the file paths
+        const picturePath = `images/${picture.filename}`;
+        const gameFilePath = `images/${gameFile.filename}`;
+
+        // Create a new post object
+        const newPost = new Post({
+            name:name,
+            creatorName:creatorName,
+            pictureUrl: picturePath,
+            gameFileUrl: gameFilePath,
+            creatorUserId: creatorUserId,
+
+        });
+        console.log(newPost);
         
-    // Extract data from the request body
-    const { name, creatorName } = req.body;
 
-    // Extract file information from req.files
-    const picture: Express.Multer.File = (req.files as any)['picture'][0];
-    const gameFile: Express.Multer.File = (req.files as any)['gameFile'][0];
+        // Save the post to the database
+        const savedPost = await newPost.save();
 
-    // Construct the file paths
-    const picturePath = `images/${picture.filename}`;
-    const gameFilePath = `images/${gameFile.filename}`;
-    
-    // Create a new post object
-    const newPost = new Post({
-      name,
-      creatorName,
-      pictureUrl: picturePath,
-      gameFileUrl: gameFilePath,
-    });
-
-    // Save the post to the database
-    const savedPost = await newPost.save();
-
-    res.status(201).json(savedPost);
-  } catch (error) {
-    console.error("Error creating post:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+        res.status(201).json(savedPost);
+    } catch (error) {
+        console.error("Error creating post:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
 export const updatePost = async (req: Request, res: Response) => {
-  try {
-    const postId = req.params.id;
-    const updatedPost: IPost | null = await Post.findByIdAndUpdate(postId, req.body, { new: true });
-    
-    if (!updatedPost) {
-      return res.status(404).json({ error: "Post not found" });
-    }
+    try {
+        const postId = req.params.id;
+        const updatedPost: IPost | null = await Post.findByIdAndUpdate(
+            postId,
+            req.body,
+            { new: true }
+        );
 
-    res.status(200).json(updatedPost);
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+        if (!updatedPost) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
 
 export const deletePost = async (req: Request, res: Response) => {
-  try {
-    const postId = req.params.id;
-    const deletedPost :any = await Post.findByIdAndDelete(postId);//Change the any
-    
-    if (!deletedPost) {
-      console.log('bbbb');
-      
-      return res.status(404).json({ error: "Post not found" });
-    }else{
-      
-      const pictureUrl = "public/"+ deletedPost.pictureUrl;
-      const gameFileUrl = "public/"+ deletedPost.gameFileUrl;
+    try {
+        const postId = req.params.id;
+        const deletedPost: any = await Post.findByIdAndDelete(postId); //Change the any
 
-      deleteFile(pictureUrl)
-      deleteFile(gameFileUrl)
+        if (!deletedPost) {
+            return res.status(404).json({ error: "Post not found" });
+        } else {
+            const pictureUrl = "public/" + deletedPost.pictureUrl;
+            const gameFileUrl = "public/" + deletedPost.gameFileUrl;
+
+            deleteFile(pictureUrl);
+            deleteFile(gameFileUrl);
+        }
+
+        res.status(200).json(deletedPost);
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
     }
-
-    res.status(200).json(deletedPost);
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
 };
-
 
 export const getAllPosts = async (req: Request, res: Response) => {
-  try {
-    // Retrieve all posts from the database
-    const allPosts: IPost[] = await Post.find();
+    try {
+        // Retrieve all posts from the database
+        const allPosts: IPost[] = await Post.find();
 
-    res.status(200).json(allPosts);
-  } catch (error) {
-    console.error("Error fetching all posts:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+        res.status(200).json(allPosts);
+    } catch (error) {
+        console.error("Error fetching all posts:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
 
-
-
-const deleteFile =async (filePath:string) => {
-  try {
-    await fs.unlink(filePath, (deleteError) => {
-        if (deleteError) {
-            console.error("Error deleting old file:", deleteError);
-        } else {
-            console.log("Old file deleted successfully");
-        }
-    });
-  } catch (deleteError) {
-      console.error("Error deleting old file:", deleteError);
-  }}
+const deleteFile = async (filePath: string) => {
+    try {
+        await fs.unlink(filePath, (deleteError) => {
+            if (deleteError) {
+                console.error("Error deleting old file:", deleteError);
+            } else {
+                console.log("Old file deleted successfully");
+            }
+        });
+    } catch (deleteError) {
+        console.error("Error deleting old file:", deleteError);
+    }
+};

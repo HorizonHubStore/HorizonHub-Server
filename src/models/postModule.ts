@@ -13,6 +13,7 @@ export interface IPost extends Document {
   gameFileUrl: string;
   comments: IComment[];
   creatorName: string;
+  creatorUserId : string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +33,7 @@ const postSchema = new Schema<IPost>(
     gameFileUrl: { type: String, required: true },
     comments: { type: [commentSchema], default: [] },
     creatorName: { type: String, required: true },
+    creatorUserId : { type: String, required: true },
   },
   { timestamps: true }
 );
