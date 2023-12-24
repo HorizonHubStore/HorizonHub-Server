@@ -27,6 +27,6 @@ router.post("/createPost", authenticate, upload.fields([
 
 router.get("/getAllPosts",postController.getAllPosts)
 router.put("/posts/:id", authenticate, postController.updatePost); 
-router.delete("/posts/:id", authenticate, postController.deletePost); 
+router.delete("/delete/:id", authenticate, postController.deletePost); 
 
 export default router;
