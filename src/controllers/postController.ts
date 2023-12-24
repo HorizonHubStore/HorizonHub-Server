@@ -41,9 +41,14 @@ export const createPost = async (req: Request, res: Response) => {
 export const updatePost = async (req: Request, res: Response) => {
     try {
         const postId = req.params.id;
+
+        // Extract only the name from req.body
+        const { name } = req.body;
+
+        // Update only the name in the database
         const updatedPost: IPost | null = await Post.findByIdAndUpdate(
             postId,
-            req.body,
+            { name },
             { new: true }
         );
 
