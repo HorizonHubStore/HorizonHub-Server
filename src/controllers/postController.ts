@@ -1,13 +1,10 @@
 // postController.ts
 import { Request, Response } from "express";
 import Post, { IPost } from "../models/postModule";
-import * as path from "path";
-
-import * as fs from "fs";
+import * as fileController from './fileController'
 
 export const createPost = async (req: Request, res: Response) => {
     try {
-        console.log(req.body);
 
         // Extract data from the request body
         const { name, creatorUserId, creatorName } = req.body;
@@ -71,8 +68,8 @@ export const deletePost = async (req: Request, res: Response) => {
             const pictureUrl = "public/" + deletedPost.pictureUrl;
             const gameFileUrl = "public/" + deletedPost.gameFileUrl;
 
-            deleteFile(pictureUrl);
-            deleteFile(gameFileUrl);
+            fileController.deleteFile(pictureUrl);
+            fileController.deleteFile(gameFileUrl);
         }
 
         res.status(200).json(deletedPost);
@@ -93,16 +90,3 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-const deleteFile = async (filePath: string) => {
-    try {
-        await fs.unlink(filePath, (deleteError) => {
-            if (deleteError) {
-                console.error("Error deleting old file:", deleteError);
-            } else {
-                console.log("Old file deleted successfully");
-            }
-        });
-    } catch (deleteError) {
-        console.error("Error deleting old file:", deleteError);
-    }
-};
