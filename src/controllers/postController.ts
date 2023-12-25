@@ -26,8 +26,6 @@ export const createPost = async (req: Request, res: Response) => {
             creatorUserId: creatorUserId,
 
         });
-        console.log(newPost);
-        
 
         // Save the post to the database
         const savedPost = await newPost.save();

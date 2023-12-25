@@ -15,6 +15,5 @@ router.post('/logout', authenticate, authController.logout);
 
 router.get('/refreashToken', authController.refreashToken)
 
-router.get('/dashboard', authenticate, authController.dashboard);
 
 export default router;

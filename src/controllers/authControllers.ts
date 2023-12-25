@@ -199,8 +199,5 @@ async function logout(req: Request, res: Response) {
     res.json({message: "Logged out successfully"});
 }
 
-async function dashboard(req: Request, res: Response) {
-    res.json({message: "Welcome to the dashboard", user: req.body.user});
-}
 
-export {signup, login,googleLogin, logout, refreashToken, dashboard};
+export {signup, login,googleLogin, logout, refreashToken};
