@@ -115,7 +115,7 @@ async function googleLogin(req: Request, res: Response) {
 }
 
 
-async function refreashToken(req: Request, res: Response, next: NextFunction) {
+async function refreashToken(req: Request, res: Response, _next: NextFunction) {
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[1];
 
