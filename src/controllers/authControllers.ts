@@ -3,7 +3,7 @@ import {NextFunction, Request, Response} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import User from "../models/userModule";
-import { saveUserProfilePicture } from "./userController";
+import {saveUserProfilePicture} from "./userController";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
@@ -16,7 +16,7 @@ async function signup(req: Request, res: Response) {
         // Check if the user already exists
         const existingUser = await User.findOne({username});
         if (existingUser)
-            return res.status(400).json({message: "User already exists"});
+            return res.status(409).json({message: "User already exists"});
 
         // Hash the password before saving it to the database
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -78,16 +78,16 @@ async function googleLogin(req: Request, res: Response) {
     try {
         const {credentials} = req.body;
         // Check if the user exists
-        let user = await User.findOne({username:credentials.email});
-        
-        if (!user){
-            saveUserProfilePicture({pictureUrl:credentials.picture,username:credentials.email})
+        let user = await User.findOne({username: credentials.email});
+
+        if (!user) {
+            saveUserProfilePicture({pictureUrl: credentials.picture, username: credentials.email})
             const hashedPassword = await bcrypt.hash("placeHolder", 10);
             const newUser = new User({
                 username: credentials.email,
                 password: hashedPassword,
                 fullName: credentials.name,
-                picture: 'images/'+credentials.email+".jpg"
+                picture: 'images/' + credentials.email + ".jpg"
             });
             user = await newUser.save();
         }
@@ -113,7 +113,6 @@ async function googleLogin(req: Request, res: Response) {
         res.status(500).json({message: "Internal Server Error"});
     }
 }
-
 
 
 async function refreashToken(req: Request, res: Response, next: NextFunction) {
@@ -206,4 +205,4 @@ async function dashboard(req: Request, res: Response) {
     res.json({message: "Welcome to the dashboard", user: req.body.user});
 }
 
-export {signup, login,googleLogin, logout, refreashToken, dashboard};
+export {signup, login, googleLogin, logout, refreashToken, dashboard};

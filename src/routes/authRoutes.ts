@@ -4,6 +4,44 @@ import * as authController from '../controllers/authControllers';
 
 const router: Router = express.Router();
 
+/**
+ * @openapi
+ * /auth/healthcheck:
+ *  get:
+ *     tags:
+ *     - Healthcheck
+ *     description: Responds if the app is up and running
+ *     responses:
+ *       200:
+ *         description: App is up and running
+ */
+router.get('/healthcheck', (req, res) => res.sendStatus(200));
+
+/**
+ * @openapi
+ * /auth/signup:
+ *  post:
+ *     tags:
+ *     - Authentication
+ *     summary: Register a user
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/CreateUserInput'
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateUserResponse'
+ *      409:
+ *        description: Conflict
+ *      400:
+ *        description: Bad request
+ */
 router.post('/signup', authController.signup);
 
 router.post('/login', authController.login);

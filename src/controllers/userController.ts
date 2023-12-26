@@ -1,12 +1,9 @@
 // userController.ts
 
 import axios from "axios";
-import multer from "multer";
 import * as fs from "fs";
 import * as path from "path";
-import * as stream from "stream";
-import User, { IUser } from "../models/userModule";
-import { NextFunction, Request, Response } from "express";
+import User from "../models/userModule";
 
 async function saveUserProfilePicture(profile: {
     pictureUrl: string;
@@ -52,7 +49,7 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         }
 
         const oldPicturePath = path.join("public", currentUser.picture);
-        
+
 
         // Delete the old file from the server
         if (
@@ -75,8 +72,8 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         // Update the user's picture path in the database
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { $set: { picture: newPicturePath } },
-            { new: true }
+            {$set: {picture: newPicturePath}},
+            {new: true}
         );
 
         if (!updatedUser) {
@@ -88,4 +85,5 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         console.error("Error updating user picture in the database:", error);
     }
 }
-export { saveUserProfilePicture, updateUserPicture };
+
+export {saveUserProfilePicture, updateUserPicture};
