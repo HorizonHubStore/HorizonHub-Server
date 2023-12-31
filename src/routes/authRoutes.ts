@@ -44,6 +44,31 @@ router.get('/healthcheck', (req, res) => res.sendStatus(200));
  */
 router.post('/signup', authController.signup);
 
+/**
+ * @openapi
+ * /auth/login:
+ *  post:
+ *     tags:
+ *     - Authentication
+ *     summary: Login a user
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/LoginUserInput'
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/LoginUserResponse'
+ *      409:
+ *        description: Conflict
+ *      400:
+ *        description: Bad request
+ */
 router.post('/login', authController.login);
 
 router.post('/googleLogin', authController.googleLogin);
