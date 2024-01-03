@@ -95,7 +95,6 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
 export const addComment = async (req: Request, res: Response) => {
     try {
-        console.log("added comment");
 
         // Extract comment information from the request body
         const { text, userId, postId } = req.body;
@@ -129,9 +128,6 @@ export const addComment = async (req: Request, res: Response) => {
 export const getPostComments = async (req: Request, res: Response) => {
     try {
         const postId = req.params.postId;
-        console.log("getPostComments");
-        
-        console.log(postId);
         
         // Find the post by postId
         const post: IPost | null = await Post.findById(postId);
