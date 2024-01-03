@@ -5,13 +5,12 @@ import * as path from "path";
 import User, { IUser } from "../models/userModule";
 import { Request, Response } from "express";
 
-
-export const updateUserPicture = async(req: Request, res: Response) => {
+export const updateUserPicture = async (req: Request, res: Response) => {
     try {
         // Retrieve the current user's data to get the old picture path
         const { userId } = req.body;
-        const pictureName = req.file?.filename
-        
+        const pictureName = req.file?.filename;
+
         // Construct the file paths
         const picturePath = `images/${pictureName}`;
         const currentUser = await User.findById(userId);
@@ -22,7 +21,6 @@ export const updateUserPicture = async(req: Request, res: Response) => {
         }
 
         const oldPicturePath = path.join("public", currentUser.picture);
-        
 
         // Delete the old file from the server
         if (
@@ -55,15 +53,31 @@ export const updateUserPicture = async(req: Request, res: Response) => {
             console.log("User picture updated successfully");
         }
         console.log(picturePath);
-        
-        res.status(201).json({filePath : picturePath});
 
+        res.status(201).json({ filePath: picturePath });
     } catch (error) {
         console.error("Error updating user picture in the database:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
 
-export const getUserData = async(req: Request, res: Response) => {
-    
-}
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+
+        // Retrieve user from the database by userId
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Return relevant user information
+     
+        res.status(200).send({ userData: user });
+
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
