@@ -10,5 +10,8 @@ router.post("/createPost",authenticate,fileController.uploadPostFiles,postContro
 router.get("/getAllPosts", authenticate, postController.getAllPosts);
 router.put("/update/:id", authenticate, postController.updatePost);
 router.delete("/delete/:id", authenticate, postController.deletePost);
+router.post("/addComment",authenticate, postController.addComment)
+router.get("/getPostComments/:postId",authenticate, postController.getPostComments)
+
 
 export default router;

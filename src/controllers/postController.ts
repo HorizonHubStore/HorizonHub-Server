@@ -1,11 +1,11 @@
 // postController.ts
 import { Request, Response } from "express";
-import Post, { IPost } from "../models/postModule";
-import * as fileController from './fileController'
+import Post, { IComment, IPost } from "../models/postModule";
+import * as fileController from "./fileController";
+import User from "../models/userModule";
 
 export const createPost = async (req: Request, res: Response) => {
     try {
-
         // Extract data from the request body
         const { name, creatorUserId, creatorName } = req.body;
 
@@ -19,12 +19,11 @@ export const createPost = async (req: Request, res: Response) => {
 
         // Create a new post object
         const newPost = new Post({
-            name:name,
-            creatorName:creatorName,
+            name: name,
+            creatorName: creatorName,
             pictureUrl: picturePath,
             gameFileUrl: gameFilePath,
             creatorUserId: creatorUserId,
-
         });
 
         // Save the post to the database
@@ -93,3 +92,61 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
+
+export const addComment = async (req: Request, res: Response) => {
+    try {
+        console.log("added comment");
+
+        // Extract comment information from the request body
+        const { text, userId, postId } = req.body;
+
+        // Find the post to which the comment will be added
+        const post: IPost | null = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        // Create a new comment
+        const newComment: IComment = {
+            text:text,
+            author:userId, // Assuming userId corresponds to creatorUserId
+        };
+
+        // Add the comment to the post's comments array
+        post.comments.push(newComment);
+
+        // Save the updated post with the new comment
+        const updatedPost: IPost | null = await post.save();
+
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        console.error("Error adding comment:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const getPostComments = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.postId;
+        console.log("getPostComments");
+        
+        console.log(postId);
+        
+        // Find the post by postId
+        const post: IPost | null = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        // Extract comments from the post
+        const comments = post.comments;
+        
+
+        res.status(200).json(comments);
+    } catch (error) {
+        console.error("Error fetching post comments:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};

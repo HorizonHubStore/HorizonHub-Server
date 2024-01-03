@@ -1,10 +1,9 @@
 // post.ts
 import mongoose, { Document, Schema } from "mongoose";
-import { IUser } from "./userModule";
 
-export interface IComment extends Document {
+export interface IComment {
   text: string;
-  author: IUser["_id"];
+  author: string;
 }
 
 export interface IPost extends Document {
@@ -21,7 +20,7 @@ export interface IPost extends Document {
 const commentSchema = new Schema<IComment>(
   {
     text: { type: String, required: true },
-    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    author: { type: String, required: true },
   },
   { timestamps: true }
 );
@@ -39,5 +38,6 @@ const postSchema = new Schema<IPost>(
 );
 
 const Post = mongoose.model<IPost>("Post", postSchema);
+
 
 export default Post;
