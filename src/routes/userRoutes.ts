@@ -1,7 +1,8 @@
 // userRoutes.js
-const express = require("express");
-const router = express.Router();
+import express from "express";
 import * as FileController from "../controllers/fileController";
+
+const router = express.Router();
 
 // Define routes
 router.put(

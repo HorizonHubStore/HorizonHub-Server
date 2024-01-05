@@ -1,5 +1,5 @@
 // src/controllers/authController.ts
-import {NextFunction, Request, Response} from "express";
+import {Request, Response} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import User from "../models/userModule";
@@ -7,7 +7,7 @@ import {saveUserProfilePicture} from "./userController";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
-const refreashTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
+const refreshTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
 
 async function signup(req: Request, res: Response) {
     try {
@@ -57,7 +57,7 @@ async function login(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreashTokenSecret);
+        const refreashToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
         if (user.tokens == null) user.tokens = [refreashToken];
         else user.tokens.push(refreashToken);
@@ -97,7 +97,7 @@ async function googleLogin(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreashTokenSecret);
+        const refreashToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
         if (user.tokens == null) user.tokens = [refreashToken];
         else user.tokens.push(refreashToken);
@@ -115,15 +115,15 @@ async function googleLogin(req: Request, res: Response) {
 }
 
 
-async function refreashToken(req: Request, res: Response, _next: NextFunction) {
-    const authHeaders = req.headers["authorization"];
+async function refreshToken(req: Request, res: Response) {
+    const authHeaders = req.headers.authorization;
     const token = authHeaders && authHeaders.split(" ")[1];
 
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
     }
 
-    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+    jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
             return res.status(403).send(err.message);
         }
@@ -136,7 +136,6 @@ async function refreashToken(req: Request, res: Response, _next: NextFunction) {
             }
 
             if (!user.tokens.includes(token)) {
-                //@ts-ignore
                 user.tokens = [];
                 await user?.save();
                 return res.status(403).send("Invalid request");
@@ -152,7 +151,7 @@ async function refreashToken(req: Request, res: Response, _next: NextFunction) {
 
             const refreashToken = jwt.sign(
                 {_id: user?._id},
-                refreashTokenSecret
+                refreshTokenSecret
             );
             user.tokens[user.tokens.indexOf(token)] = refreashToken;
             await user?.save();
@@ -174,7 +173,7 @@ async function logout(req: Request, res: Response) {
         return res.sendStatus(401); // Unauthorized
     }
 
-    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+    jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
             return res.status(403).send(err.message);
         }
@@ -186,7 +185,6 @@ async function logout(req: Request, res: Response) {
             }
 
             if (!user.tokens.includes(token)) {
-                //@ts-ignore
                 user.tokens = [];
                 await user.save();
                 return res.status(403).send("Invalid request");
@@ -205,4 +203,4 @@ async function dashboard(req: Request, res: Response) {
     res.json({message: "Welcome to the dashboard", user: req.body.user});
 }
 
-export {signup, login, googleLogin, logout, refreashToken, dashboard};
+export {signup, login, googleLogin, logout, refreshToken, dashboard};

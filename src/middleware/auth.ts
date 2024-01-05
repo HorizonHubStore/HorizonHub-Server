@@ -7,7 +7,7 @@ const authenticate = async (
     next: NextFunction
 ) => {
     try {
-        const authHeaders = req.headers["authorization"];
+        const authHeaders = req.headers.authorization;
         const token = authHeaders && authHeaders.split(" ")[1];
 
         if (token == null) {
@@ -20,8 +20,6 @@ const authenticate = async (
                 return res.status(403).send(err.message);
             }
 
-            // @ts-ignore
-            req.user = user;
             next();
         });
     } catch (error) {

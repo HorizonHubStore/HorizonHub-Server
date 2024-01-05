@@ -73,10 +73,52 @@ router.post('/login', authController.login);
 
 router.post('/googleLogin', authController.googleLogin);
 
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Logout a user
+ *     security:
+ *     - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Logged out successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.post('/logout', authenticate, authController.logout);
 
-router.get('/refreashToken', authController.refreashToken)
+router.get('/refreashToken', authController.refreshToken);
 
+/**
+ * @openapi
+ * /auth/dashboard:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *     summary: Get user dashboard
+ *     security:
+ *     - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get('/dashboard', authenticate, authController.dashboard);
 
 export default router;

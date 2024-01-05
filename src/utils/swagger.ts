@@ -4,7 +4,6 @@ import {version} from '../../package.json';
 import swaggerUi from 'swagger-ui-express';
 
 const swaggerPath = 'swagger';
-
 const options: swaggerjsdoc.Options = {
     definition: {
         openapi: "3.0.0",
@@ -13,16 +12,13 @@ const options: swaggerjsdoc.Options = {
             version
         },
         components: {
-            securitySchemas: {
+            securitySchemes: {
                 bearerAuth: {
                     type: 'http',
                     scheme: 'bearer',
-                    bearerFormat: 'JWT',
+                    in: 'header',
                 },
             },
-        },
-        security: {
-            bearerAuth: [],
         },
     },
     apis: ["./src/routes/*.ts", "./src/models/*.ts"],
@@ -32,7 +28,7 @@ const swaggerSpec = swaggerjsdoc(options);
 
 const SwaggerDocs = (app: Express, port: number) => {
     app.use(`/${swaggerPath}`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    app.get(`${swaggerPath}.json`, (req, res) => {
+    app.get(`${swaggerPath}.json`, (_req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.send(swaggerSpec);
     });
