@@ -132,7 +132,7 @@ async function refreshToken(req: Request, res: Response) {
             const user = await User.findById((userInfo as JwtPayload)._id);
 
             if (!user?.tokens) {
-                throw new Error("User tokens not available");
+                return res.status(400).send("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {
@@ -181,7 +181,7 @@ async function logout(req: Request, res: Response) {
 
         try {
             if (!user?.tokens) {
-                throw new Error("User tokens not available"); // or handle it differently
+                return res.status(400).send("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {

@@ -15,7 +15,7 @@ const authenticate = async (
         }
         const accessTokenSecret: string = process.env
             .ACCESS_TOKEN_SECRET as string;
-        jwt.verify(token, accessTokenSecret, (err, user) => {
+        jwt.verify(token, accessTokenSecret, (err) => {
             if (err) {
                 return res.status(403).send(err.message);
             }
