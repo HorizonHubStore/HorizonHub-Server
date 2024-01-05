@@ -57,15 +57,15 @@ async function login(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreshTokenSecret);
+        const refreshToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
-        if (user.tokens == null) user.tokens = [refreashToken];
-        else user.tokens.push(refreashToken);
+        if (user.tokens == null) user.tokens = [refreshToken];
+        else user.tokens.push(refreshToken);
         await user.save();
         // Return the token as { token }
         res.status(200).send({
             accessToken: AccessToken,
-            refreashToken: refreashToken,
+            refreshToken: refreshToken,
             userData: user
         });
     } catch (error) {
@@ -97,15 +97,15 @@ async function googleLogin(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreshTokenSecret);
+        const refreshToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
-        if (user.tokens == null) user.tokens = [refreashToken];
-        else user.tokens.push(refreashToken);
+        if (user.tokens == null) user.tokens = [refreshToken];
+        else user.tokens.push(refreshToken);
         await user.save();
         // Return the token as { token }
         res.status(200).send({
             accessToken: AccessToken,
-            refreashToken: refreashToken,
+            refreshToken: refreshToken,
             userData: user
         });
     } catch (error) {
@@ -149,15 +149,15 @@ async function refreshToken(req: Request, res: Response) {
                 }
             );
 
-            const refreashToken = jwt.sign(
+            const refreshToken = jwt.sign(
                 {_id: user?._id},
                 refreshTokenSecret
             );
-            user.tokens[user.tokens.indexOf(token)] = refreashToken;
+            user.tokens[user.tokens.indexOf(token)] = refreshToken;
             await user?.save();
             res.status(200).send({
                 accessToken: AccessToken,
-                refreashToken: refreashToken,
+                refreshToken: refreshToken,
             });
         } catch (err) {
             return res.status(403).send(err);

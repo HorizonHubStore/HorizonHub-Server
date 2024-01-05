@@ -100,7 +100,7 @@ router.post('/googleLogin', authController.googleLogin);
  */
 router.post('/logout', authenticate, authController.logout);
 
-router.get('/refreashToken', authController.refreshToken);
+router.get('/refreshToken', authController.refreshToken);
 
 /**
  * @openapi
