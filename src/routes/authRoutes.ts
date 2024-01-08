@@ -104,23 +104,6 @@ router.post('/logout', authenticate, authController.logout);
 router.post('/refreshToken', authController.refreshToken)
 
 
-/**
- * @openapi
- * /auth/dashboard:
- *   get:
- *     tags:
- *       - Authentication
- *     summary: Get user dashboard
- *     security:
- *     - bearerAuth: []
- *     responses:
- *       200:
- *         description: Success
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- */
-router.get('/dashboard', authenticate, authController.dashboard);
+
 
 export default router;
