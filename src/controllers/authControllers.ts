@@ -115,7 +115,6 @@ async function googleLogin(req: Request, res: Response) {
 
 
 async function refreshToken(req: Request, res: Response) {
-    console.log('asdasd');
     
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[2];
@@ -131,11 +130,9 @@ async function refreshToken(req: Request, res: Response) {
             
             return res.status(403).send(err.message);
         }
-        console.log(userInfo);
         
         try {
             const user = await User.findById((userInfo as JwtPayload)._id);
-            console.log(user?.tokens);
             
             if (!user?.tokens) {
                 return res.status(400).send("User tokens not available");
@@ -144,7 +141,6 @@ async function refreshToken(req: Request, res: Response) {
             if (!user.tokens.includes(token)) {
                 user.tokens = [];
                 await user?.save();
-                console.log('b');
 
                 return res.status(403).send("Invalid request");
             }
@@ -163,7 +159,6 @@ async function refreshToken(req: Request, res: Response) {
             );
             user.tokens.push(refreshToken);
             await user?.save();
-            console.log('success');
             
             res.status(200).send({
                 accessToken: AccessToken,
