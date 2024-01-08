@@ -17,7 +17,7 @@ const authenticate = async (
             .ACCESS_TOKEN_SECRET as string;
         jwt.verify(token, accessTokenSecret, (err, user) => {
             if (err) {
-                return res.status(403).send(err.message);
+                return res.status(401).send(err.message);
             }
 
             next();

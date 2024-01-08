@@ -6,7 +6,7 @@ import User from "../models/userModule";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
-const refreashTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
+const refreshTokenSecret: string = process.env.REFRESH_TOKEN_SECRET as string;
 
 async function signup(req: Request, res: Response) {
     try {
@@ -56,15 +56,15 @@ async function login(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreashTokenSecret);
+        const refreshToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
-        if (user.tokens == null) user.tokens = [refreashToken];
-        else user.tokens.push(refreashToken);
+        if (user.tokens == null) user.tokens = [refreshToken];
+        else user.tokens.push(refreshToken);
         await user.save();
         // Return the token as { token }
         res.status(200).send({
             accessToken: AccessToken,
-            refreashToken: refreashToken,
+            refreshToken: refreshToken,
             userData: user
         });
     } catch (error) {
@@ -94,15 +94,15 @@ async function googleLogin(req: Request, res: Response) {
             expiresIn: jwtTokenExpiration,
         });
 
-        const refreashToken = jwt.sign({_id: user._id}, refreashTokenSecret);
+        const refreshToken = jwt.sign({_id: user._id}, refreshTokenSecret);
 
-        if (user.tokens == null) user.tokens = [refreashToken];
-        else user.tokens.push(refreashToken);
+        if (user.tokens == null) user.tokens = [refreshToken];
+        else user.tokens.push(refreshToken);
         await user.save();
         // Return the token as { token }
         res.status(200).send({
             accessToken: AccessToken,
-            refreashToken: refreashToken,
+            refreshToken: refreshToken,
             userData: user
         });
     } catch (error) {
@@ -113,30 +113,37 @@ async function googleLogin(req: Request, res: Response) {
 
 
 
-async function refreashToken(req: Request, res: Response, next: NextFunction) {
+async function refreshToken(req: Request, res: Response, next: NextFunction) {
+    console.log('asdasd');
+    
     const authHeaders = req.headers["authorization"];
-    const token = authHeaders && authHeaders.split(" ")[1];
-
+    const token = authHeaders && authHeaders.split(" ")[2];
+    
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
     }
 
-    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+    jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
+            console.log('a');
+            
             return res.status(403).send(err.message);
         }
-
+        console.log(userInfo);
+        
         try {
             const user = await User.findById((userInfo as JwtPayload)._id);
-
+            console.log(user?.tokens);
+            
             if (!user?.tokens) {
                 throw new Error("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {
-                //@ts-ignore
                 user.tokens = [];
                 await user?.save();
+                console.log('b');
+
                 return res.status(403).send("Invalid request");
             }
 
@@ -148,15 +155,17 @@ async function refreashToken(req: Request, res: Response, next: NextFunction) {
                 }
             );
 
-            const refreashToken = jwt.sign(
+            const refreshToken = jwt.sign(
                 {_id: user?._id},
-                refreashTokenSecret
+                refreshTokenSecret
             );
-            user.tokens[user.tokens.indexOf(token)] = refreashToken;
+            user.tokens.push(refreshToken);
             await user?.save();
+            console.log('success');
+            
             res.status(200).send({
                 accessToken: AccessToken,
-                refreashToken: refreashToken,
+                refreshToken: refreshToken,
             });
         } catch (err) {
             return res.status(403).send(err);
@@ -172,7 +181,7 @@ async function logout(req: Request, res: Response) {
         return res.sendStatus(401); // Unauthorized
     }
 
-    jwt.verify(token, refreashTokenSecret, async (err, userInfo) => {
+    jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
             return res.status(403).send(err.message);
         }
@@ -200,4 +209,4 @@ async function logout(req: Request, res: Response) {
 }
 
 
-export {signup, login,googleLogin, logout, refreashToken};
+export {signup, login,googleLogin, logout, refreshToken};

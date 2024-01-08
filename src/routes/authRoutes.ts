@@ -13,7 +13,7 @@ router.post('/googleLogin', authController.googleLogin);
 
 router.post('/logout', authenticate, authController.logout);
 
-router.get('/refreashToken', authController.refreashToken)
+router.post('/refreshToken', authController.refreshToken)
 
 
 export default router;

@@ -10,6 +10,7 @@ router.post("/createPost",authenticate,fileController.uploadPostFiles,postContro
 router.get("/getAllPosts", authenticate, postController.getAllPosts);
 router.put("/update/:id", authenticate, postController.updatePost);
 router.delete("/delete/:id", authenticate, postController.deletePost);
+router.get("/getPost/:id", authenticate, postController.getPost);
 router.post("/addComment",authenticate, postController.addComment)
 router.get("/getPostComments/:postId",authenticate, postController.getPostComments)
 

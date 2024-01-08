@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import Post, { IComment, IPost } from "../models/postModule";
 import * as fileController from "./fileController";
-import User from "../models/userModule";
+import User, { IUser } from "../models/userModule";
 
 export const createPost = async (req: Request, res: Response) => {
     try {
@@ -80,6 +80,24 @@ export const deletePost = async (req: Request, res: Response) => {
     }
 };
 
+export const getPost = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.id;
+        const Posta: any = await Post.findById(postId); //Change the any
+
+        if (!Post) {
+            return res.status(404).json({ error: "Post not found" });
+        } else {
+            res.status(200).json(Posta);
+
+        }
+
+    
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
 export const getAllPosts = async (req: Request, res: Response) => {
     try {
         // Retrieve all posts from the database
@@ -105,11 +123,14 @@ export const addComment = async (req: Request, res: Response) => {
         if (!post) {
             return res.status(404).json({ error: "Post not found" });
         }
-
+        const user : IUser | null = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "Post not found" });
+        }
         // Create a new comment
         const newComment: IComment = {
             text:text,
-            author:userId, // Assuming userId corresponds to creatorUserId
+            author:user.fullName, // Assuming userId corresponds to creatorUserId
         };
 
         // Add the comment to the post's comments array
