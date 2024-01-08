@@ -5,6 +5,7 @@ import * as path from "path";
 import User, { IUser } from "../models/userModule";
 import { Request, Response } from "express";
 
+
 export const updateUserPicture = async (req: Request, res: Response) => {
     try {
         // Retrieve the current user's data to get the old picture path
@@ -81,3 +82,5 @@ export const getUserById = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+export {saveUserProfilePicture, updateUserPicture};

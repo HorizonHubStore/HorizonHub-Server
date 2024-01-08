@@ -1,15 +1,15 @@
 // src/app.ts
 import express from 'express';
 import {closeDB, connectDB} from './db/db';
-import authRouter from './routes/authRoutes'
-import userRouter from './routes/userRoutes'
 import postRouter from './routes/postRoutes'
-
-import cors from 'cors'
-import path from 'path'
+import authRouter from './routes/authRoutes';
+import userRouter from './routes/userRoutes';
+import cors from 'cors';
+import path from 'path';
+import SwaggerDocs from "./utils/swagger";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT: number = process.env.PORT || 3001;
 
 // Connect to MongoDB
 connectDB();
@@ -33,6 +33,8 @@ app.use('/user', userRouter)
 // Start server
 export const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+
+    SwaggerDocs(app, PORT);
 });
 
 // Handle graceful shutdown

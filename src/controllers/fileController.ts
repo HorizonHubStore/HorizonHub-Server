@@ -37,6 +37,7 @@ const deleteFile = async (filePath: string) => {
         });
     } catch (deleteError) {
         console.error("Error deleting old file:", deleteError);
+
     }
 };
 

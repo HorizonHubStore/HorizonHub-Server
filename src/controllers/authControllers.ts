@@ -1,8 +1,9 @@
 // src/controllers/authController.ts
-import {NextFunction, Request, Response} from "express";
+import {Request, Response} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import User from "../models/userModule";
+import {saveUserProfilePicture} from "./userController";
 
 const accessTokenSecret: string = process.env.ACCESS_TOKEN_SECRET as string;
 const jwtTokenExpiration: string = process.env.JWT_TOKEN_EXPIRATION as string;
@@ -15,7 +16,7 @@ async function signup(req: Request, res: Response) {
         // Check if the user already exists
         const existingUser = await User.findOne({username});
         if (existingUser)
-            return res.status(400).json({message: "User already exists"});
+            return res.status(409).json({message: "User already exists"});
 
         // Hash the password before saving it to the database
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,14 +78,16 @@ async function googleLogin(req: Request, res: Response) {
     try {
         const {credentials} = req.body;
         // Check if the user exists
-        let user = await User.findOne({username:credentials.email});
-        
-        if (!user){
+
+        let user = await User.findOne({username: credentials.email});
+        if (!user) {
+            saveUserProfilePicture({pictureUrl: credentials.picture, username: credentials.email})
             const hashedPassword = await bcrypt.hash("placeHolder", 10);
             const newUser = new User({
                 username: credentials.email,
                 password: hashedPassword,
                 fullName: credentials.name,
+                picture: 'images/' + credentials.email + ".jpg"
             });
             user = await newUser.save();
         }
@@ -119,6 +122,7 @@ async function refreshToken(req: Request, res: Response, next: NextFunction) {
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[2];
     
+
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
     }
@@ -136,7 +140,7 @@ async function refreshToken(req: Request, res: Response, next: NextFunction) {
             console.log(user?.tokens);
             
             if (!user?.tokens) {
-                throw new Error("User tokens not available");
+                return res.status(400).send("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {
@@ -189,11 +193,10 @@ async function logout(req: Request, res: Response) {
 
         try {
             if (!user?.tokens) {
-                throw new Error("User tokens not available"); // or handle it differently
+                return res.status(400).send("User tokens not available");
             }
 
             if (!user.tokens.includes(token)) {
-                //@ts-ignore
                 user.tokens = [];
                 await user.save();
                 return res.status(403).send("Invalid request");

@@ -27,7 +27,7 @@ describe("Sign Up", () => {
 
 //Log in test
 let accessToken = "";
-let refreashToken = "";
+let refreshToken = "";
 describe("Login", () => {
     it("Login user", async () => {
         const res = await request(app).post("/auth/login").send({
@@ -36,15 +36,16 @@ describe("Login", () => {
         });
         expect(res.statusCode).toEqual(200);
         accessToken = res.body.accessToken;
-        refreashToken = res.body.refreashToken;
+        refreshToken = res.body.refreshToken;
 
         expect(accessToken).not.toEqual(null || undefined);
-        expect(refreashToken).not.toEqual(null || undefined);
+        expect(refreshToken).not.toEqual(null || undefined);
     });
 });
 
+
 let newAccessToken = "";
-let newRefreashToken = "";
+let newRefreshToken = "";
 jest.setTimeout(30000);
 describe("Token access", () => {
     it("timeout access", async () => {
@@ -55,15 +56,15 @@ describe("Token access", () => {
         expect(res.statusCode).not.toEqual(200);
     });
 
-    it("Refreash token", async () => {
+    it("Refresh token", async () => {
         const res = await request(app)
             .get("/auth/refreashToken")
-            .set({ authorization: "JWT " + refreashToken });
+            .set({ authorization: "JWT " + accessToken +" "+refreashToken });
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
-        newRefreashToken = res.body.refreashToken;
+        newRefreshToken = res.body.refreshToken;
         expect(newAccessToken).not.toEqual(null || undefined);
-        expect(newRefreashToken).not.toEqual(null || undefined);
+        expect(newRefreshToken).not.toEqual(null || undefined);
     });
 });
 
@@ -72,7 +73,7 @@ describe("Log out", () => {
         const response = await request(app)
             .post("/auth/logout")
             .set({
-                authorization: "JWT " + newAccessToken + " " + newRefreashToken,
+                authorization: "JWT " + newAccessToken + " " + newRefreshToken,
             });
         expect(response.statusCode).toEqual(200);
     });

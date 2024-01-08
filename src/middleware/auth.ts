@@ -7,7 +7,7 @@ const authenticate = async (
     next: NextFunction
 ) => {
     try {
-        const authHeaders = req.headers["authorization"];
+        const authHeaders = req.headers.authorization;
         const token = authHeaders && authHeaders.split(" ")[1];
 
         if (token == null) {
@@ -15,7 +15,7 @@ const authenticate = async (
         }
         const accessTokenSecret: string = process.env
             .ACCESS_TOKEN_SECRET as string;
-        jwt.verify(token, accessTokenSecret, (err, user) => {
+        jwt.verify(token, accessTokenSecret, (err) => {
             if (err) {
                 return res.status(401).send(err.message);
             }
