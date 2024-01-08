@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 const authenticate = async (
@@ -17,7 +17,7 @@ const authenticate = async (
             .ACCESS_TOKEN_SECRET as string;
         jwt.verify(token, accessTokenSecret, (err) => {
             if (err) {
-                return res.status(403).send(err.message);
+                return res.status(401).send(err.message);
             }
 
             next();

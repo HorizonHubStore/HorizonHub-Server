@@ -4,6 +4,7 @@ import * as authController from '../controllers/authControllers';
 
 const router: Router = express.Router();
 
+
 /**
  * @openapi
  * /auth/healthcheck:
@@ -100,7 +101,8 @@ router.post('/googleLogin', authController.googleLogin);
  */
 router.post('/logout', authenticate, authController.logout);
 
-router.get('/refreshToken', authController.refreshToken);
+router.post('/refreshToken', authController.refreshToken)
+
 
 /**
  * @openapi

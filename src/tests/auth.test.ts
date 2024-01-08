@@ -1,9 +1,9 @@
 // auth.test.ts
 
 import request from "supertest";
-import app, {server} from "../app";
+import app, { server } from "../app";
 
-import {closeDB} from "../db/db";
+import { closeDB } from "../db/db";
 import User from "../models/userModule";
 
 const fullname = "estFudlName";
@@ -11,11 +11,9 @@ const userName = "estUserName";
 const userPassword = "testUserPassword";
 
 beforeAll(async () => {
-    // Delete the user before running tests
-    await User.deleteOne({username: userName});
+    await User.deleteOne({ username: userName });
 });
 
-// Sign up test
 describe("Sign Up", () => {
     it("Add new user", async () => {
         const res = await request(app).post("/auth/signup").send({
@@ -26,7 +24,6 @@ describe("Sign Up", () => {
         expect(res.statusCode).toEqual(200);
     });
 });
-
 
 //Log in test
 let accessToken = "";
@@ -47,7 +44,6 @@ describe("Login", () => {
 });
 
 
-//Token Access and Resfresh tests
 let newAccessToken = "";
 let newRefreshToken = "";
 jest.setTimeout(30000);
@@ -56,14 +52,14 @@ describe("Token access", () => {
         await new Promise((r) => setTimeout(r, 3 * 1000));
         const res = await request(app)
             .get("/auth/dashboard")
-            .set({authorization: "JWT " + accessToken});
+            .set({ authorization: "JWT " + accessToken });
         expect(res.statusCode).not.toEqual(200);
     });
 
     it("Refresh token", async () => {
         const res = await request(app)
-            .get("/auth/refreshToken")
-            .set({authorization: "JWT " + refreshToken});
+            .get("/auth/refreashToken")
+            .set({ authorization: "JWT " + accessToken +" "+refreashToken });
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
         newRefreshToken = res.body.refreshToken;
@@ -72,8 +68,6 @@ describe("Token access", () => {
     });
 });
 
-
-// Log out tests
 describe("Log out", () => {
     it("should logout with authentication", async () => {
         const response = await request(app)
@@ -87,22 +81,18 @@ describe("Log out", () => {
     it("should not logout without authentication", async () => {
         const response = await request(app).post("/auth/logout").send();
 
-        // Expecting a 401 status code since the user is not authenticated
         expect(response.status).toBe(401);
     });
 });
 
 afterAll(async () => {
     try {
-        // Delete the user after running tests
-        await User.deleteOne({username: userName});
+        await User.deleteOne({ username: userName });
 
-        // Close the MongoDB connection after all tests
         await closeDB();
     } catch (error) {
         console.error("Error during cleanup:", error);
     } finally {
-        // Close the server after all tests
         server.close();
     }
 });

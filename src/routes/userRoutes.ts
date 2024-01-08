@@ -1,13 +1,17 @@
 // userRoutes.js
 import express from "express";
-import * as FileController from "../controllers/fileController";
-
 const router = express.Router();
+import * as userController from "../controllers/userController";
+import authenticate from "../middleware/auth";
+import { uploadFile } from "../controllers/fileController";
 
 // Define routes
 router.put(
     "/updatePicture",
-    FileController.uploadPicture,
+    authenticate,
+    uploadFile,
+    userController.updateUserPicture
 );
+router.get("/getUserData/:userId", authenticate, userController.getUserById);
 
 export default router;

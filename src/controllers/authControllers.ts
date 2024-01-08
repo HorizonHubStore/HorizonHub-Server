@@ -78,8 +78,8 @@ async function googleLogin(req: Request, res: Response) {
     try {
         const {credentials} = req.body;
         // Check if the user exists
-        let user = await User.findOne({username: credentials.email});
 
+        let user = await User.findOne({username: credentials.email});
         if (!user) {
             saveUserProfilePicture({pictureUrl: credentials.picture, username: credentials.email})
             const hashedPassword = await bcrypt.hash("placeHolder", 10);
@@ -115,9 +115,13 @@ async function googleLogin(req: Request, res: Response) {
 }
 
 
-async function refreshToken(req: Request, res: Response) {
-    const authHeaders = req.headers.authorization;
-    const token = authHeaders && authHeaders.split(" ")[1];
+
+async function refreshToken(req: Request, res: Response, next: NextFunction) {
+    console.log('asdasd');
+    
+    const authHeaders = req.headers["authorization"];
+    const token = authHeaders && authHeaders.split(" ")[2];
+    
 
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
@@ -125,12 +129,16 @@ async function refreshToken(req: Request, res: Response) {
 
     jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
+            console.log('a');
+            
             return res.status(403).send(err.message);
         }
-
+        console.log(userInfo);
+        
         try {
             const user = await User.findById((userInfo as JwtPayload)._id);
-
+            console.log(user?.tokens);
+            
             if (!user?.tokens) {
                 return res.status(400).send("User tokens not available");
             }
@@ -138,6 +146,8 @@ async function refreshToken(req: Request, res: Response) {
             if (!user.tokens.includes(token)) {
                 user.tokens = [];
                 await user?.save();
+                console.log('b');
+
                 return res.status(403).send("Invalid request");
             }
 
@@ -153,8 +163,10 @@ async function refreshToken(req: Request, res: Response) {
                 {_id: user?._id},
                 refreshTokenSecret
             );
-            user.tokens[user.tokens.indexOf(token)] = refreshToken;
+            user.tokens.push(refreshToken);
             await user?.save();
+            console.log('success');
+            
             res.status(200).send({
                 accessToken: AccessToken,
                 refreshToken: refreshToken,
@@ -199,8 +211,5 @@ async function logout(req: Request, res: Response) {
     res.json({message: "Logged out successfully"});
 }
 
-async function dashboard(req: Request, res: Response) {
-    res.json({message: "Welcome to the dashboard", user: req.body.user});
-}
 
-export {signup, login, googleLogin, logout, refreshToken, dashboard};
+export {signup, login,googleLogin, logout, refreshToken};

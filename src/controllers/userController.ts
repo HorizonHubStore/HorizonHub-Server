@@ -1,46 +1,19 @@
 // userController.ts
 
-import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
-import User from "../models/userModule";
+import User, { IUser } from "../models/userModule";
+import { Request, Response } from "express";
 
-async function saveUserProfilePicture(profile: {
-    pictureUrl: string;
-    username: string;
-}): Promise<void> {
-    const pictureUrl = profile.pictureUrl;
-    const username = profile.username;
 
-    // Download the image using axios
-    const response = await axios({
-        method: "get",
-        url: pictureUrl,
-        responseType: "stream",
-    });
-
-    // Create a writable stream to save the image
-    const imagePath = path.join(
-        process.cwd(),
-        "public",
-        "images",
-        `${username}.jpg`
-    );
-    const writer = fs.createWriteStream(imagePath);
-
-    // Pipe the image data to the writable stream
-    response.data.pipe(writer);
-
-    // Return a promise to await the completion of writing
-    return new Promise<void>((resolve, reject) => {
-        writer.on("finish", () => resolve());
-        writer.on("error", (error) => reject(error));
-    });
-}
-
-async function updateUserPicture(userId: string, newPicturePath: string) {
+export const updateUserPicture = async (req: Request, res: Response) => {
     try {
         // Retrieve the current user's data to get the old picture path
+        const { userId } = req.body;
+        const pictureName = req.file?.filename;
+
+        // Construct the file paths
+        const picturePath = `images/${pictureName}`;
         const currentUser = await User.findById(userId);
 
         if (!currentUser) {
@@ -49,7 +22,6 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         }
 
         const oldPicturePath = path.join("public", currentUser.picture);
-
 
         // Delete the old file from the server
         if (
@@ -72,8 +44,8 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         // Update the user's picture path in the database
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            {$set: {picture: newPicturePath}},
-            {new: true}
+            { $set: { picture: picturePath } },
+            { new: true }
         );
 
         if (!updatedUser) {
@@ -81,9 +53,34 @@ async function updateUserPicture(userId: string, newPicturePath: string) {
         } else {
             console.log("User picture updated successfully");
         }
+        console.log(picturePath);
+
+        res.status(201).json({ filePath: picturePath });
     } catch (error) {
         console.error("Error updating user picture in the database:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+
+        // Retrieve user from the database by userId
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Return relevant user information
+     
+        res.status(200).send({ userData: user });
+
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
 
 export {saveUserProfilePicture, updateUserPicture};
