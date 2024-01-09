@@ -18,13 +18,13 @@ const storage = multer.diskStorage({
 });
 
 const postFields = [
-    { name: "picture", maxCount: 1 },
-    { name: "gameFile", maxCount: 1 },
+    {name: "picture", maxCount: 1},
+    {name: "gameFile", maxCount: 1},
 ];
 
-const uploadFile = multer({ storage: storage }).single("file");
+const uploadFile = multer({storage: storage}).single("file");
 
-const uploadPostFiles = multer({ storage: storage }).fields(postFields);
+const uploadPostFiles = multer({storage: storage}).fields(postFields);
 
 const deleteFile = async (filePath: string) => {
     try {
@@ -41,4 +41,4 @@ const deleteFile = async (filePath: string) => {
     }
 };
 
-export { uploadPostFiles, deleteFile, uploadFile };
+export {uploadPostFiles, deleteFile, uploadFile};

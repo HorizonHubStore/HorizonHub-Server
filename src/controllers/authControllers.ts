@@ -113,12 +113,11 @@ async function googleLogin(req: Request, res: Response) {
 }
 
 
-
 async function refreshToken(req: Request, res: Response) {
-    
+
     const authHeaders = req.headers["authorization"];
     const token = authHeaders && authHeaders.split(" ")[2];
-    
+
 
     if (token == null) {
         return res.sendStatus(401); // Unauthorized
@@ -127,13 +126,13 @@ async function refreshToken(req: Request, res: Response) {
     jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
             console.log('a');
-            
+
             return res.status(403).send(err.message);
         }
-        
+
         try {
             const user = await User.findById((userInfo as JwtPayload)._id);
-            
+
             if (!user?.tokens) {
                 return res.status(400).send("User tokens not available");
             }
@@ -159,7 +158,7 @@ async function refreshToken(req: Request, res: Response) {
             );
             user.tokens.push(refreshToken);
             await user?.save();
-            
+
             res.status(200).send({
                 accessToken: AccessToken,
                 refreshToken: refreshToken,
@@ -205,4 +204,4 @@ async function logout(req: Request, res: Response) {
 }
 
 
-export {signup, login,googleLogin, logout, refreshToken};
+export {signup, login, googleLogin, logout, refreshToken};

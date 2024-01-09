@@ -1,9 +1,10 @@
 // userRoutes.js
 import express from "express";
-const router = express.Router();
 import * as userController from "../controllers/userController";
 import authenticate from "../middleware/auth";
-import { uploadFile } from "../controllers/fileController";
+import {uploadFile} from "../controllers/fileController";
+
+const router = express.Router();
 
 // Define routes
 router.put(

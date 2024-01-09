@@ -1,9 +1,9 @@
 // auth.test.ts
 
 import request from "supertest";
-import app, { server } from "../app";
+import app, {server} from "../app";
 
-import { closeDB } from "../db/db";
+import {closeDB} from "../db/db";
 import User from "../models/userModule";
 
 const fullname = "estFudlName";
@@ -11,7 +11,7 @@ const userName = "estUserName";
 const userPassword = "testUserPassword";
 
 beforeAll(async () => {
-    await User.deleteOne({ username: userName });
+    await User.deleteOne({username: userName});
 });
 
 describe("Sign Up", () => {
@@ -52,14 +52,14 @@ describe("Token access", () => {
         await new Promise((r) => setTimeout(r, 3 * 1000));
         const res = await request(app)
             .get("/auth/dashboard")
-            .set({ authorization: "JWT " + accessToken });
+            .set({authorization: "JWT " + accessToken});
         expect(res.statusCode).not.toEqual(200);
     });
 
     it("Refresh token", async () => {
         const res = await request(app)
             .get("/auth/refreashToken")
-            .set({ authorization: "JWT " + accessToken +" "+refreashToken });
+            .set({authorization: "JWT " + accessToken + " " + refreashToken});
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
         newRefreshToken = res.body.refreshToken;
@@ -87,7 +87,7 @@ describe("Log out", () => {
 
 afterAll(async () => {
     try {
-        await User.deleteOne({ username: userName });
+        await User.deleteOne({username: userName});
 
         await closeDB();
     } catch (error) {

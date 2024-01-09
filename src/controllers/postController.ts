@@ -1,13 +1,13 @@
 // postController.ts
-import { Request, Response } from "express";
-import Post, { IComment, IPost } from "../models/postModule";
+import {Request, Response} from "express";
+import Post, {IComment, IPost} from "../models/postModule";
 import * as fileController from "./fileController";
-import User, { IUser } from "../models/userModule";
+import User, {IUser} from "../models/userModule";
 
 export const createPost = async (req: Request, res: Response) => {
     try {
         // Extract data from the request body
-        const { name, creatorUserId, creatorName } = req.body;
+        const {name, creatorUserId, creatorName} = req.body;
 
         // Extract file information from req.files
         const picture: Express.Multer.File = (req.files as any)["picture"][0];
@@ -32,7 +32,7 @@ export const createPost = async (req: Request, res: Response) => {
         res.status(201).json(savedPost);
     } catch (error) {
         console.error("Error creating post:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 export const updatePost = async (req: Request, res: Response) => {
@@ -40,22 +40,22 @@ export const updatePost = async (req: Request, res: Response) => {
         const postId = req.params.id;
 
         // Extract only the name from req.body
-        const { name } = req.body;
+        const {name} = req.body;
 
         // Update only the name in the database
         const updatedPost: IPost | null = await Post.findByIdAndUpdate(
             postId,
-            { name },
-            { new: true }
+            {name},
+            {new: true}
         );
 
         if (!updatedPost) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         }
 
         res.status(200).json(updatedPost);
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 
@@ -65,7 +65,7 @@ export const deletePost = async (req: Request, res: Response) => {
         const deletedPost: any = await Post.findByIdAndDelete(postId); //Change the any
 
         if (!deletedPost) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         } else {
             const pictureUrl = "public/" + deletedPost.pictureUrl;
             const gameFileUrl = "public/" + deletedPost.gameFileUrl;
@@ -76,7 +76,7 @@ export const deletePost = async (req: Request, res: Response) => {
 
         res.status(200).json(deletedPost);
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 
@@ -86,15 +86,15 @@ export const getPost = async (req: Request, res: Response) => {
         const Posta: any = await Post.findById(postId); //Change the any
 
         if (!Post) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         } else {
             res.status(200).json(Posta);
 
         }
 
-    
+
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 
@@ -106,7 +106,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
         res.status(200).json(allPosts);
     } catch (error) {
         console.error("Error fetching all posts:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 
@@ -115,22 +115,22 @@ export const addComment = async (req: Request, res: Response) => {
     try {
 
         // Extract comment information from the request body
-        const { text, userId, postId } = req.body;
+        const {text, userId, postId} = req.body;
 
         // Find the post to which the comment will be added
         const post: IPost | null = await Post.findById(postId);
 
         if (!post) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         }
-        const user : IUser | null = await User.findById(userId);
+        const user: IUser | null = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         }
         // Create a new comment
         const newComment: IComment = {
-            text:text,
-            author:user.fullName, // Assuming userId corresponds to creatorUserId
+            text: text,
+            author: user.fullName, // Assuming userId corresponds to creatorUserId
         };
 
         // Add the comment to the post's comments array
@@ -142,28 +142,28 @@ export const addComment = async (req: Request, res: Response) => {
         res.status(200).json(updatedPost);
     } catch (error) {
         console.error("Error adding comment:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };
 
 export const getPostComments = async (req: Request, res: Response) => {
     try {
         const postId = req.params.postId;
-        
+
         // Find the post by postId
         const post: IPost | null = await Post.findById(postId);
 
         if (!post) {
-            return res.status(404).json({ error: "Post not found" });
+            return res.status(404).json({error: "Post not found"});
         }
 
         // Extract comments from the post
         const comments = post.comments;
-        
+
 
         res.status(200).json(comments);
     } catch (error) {
         console.error("Error fetching post comments:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 };

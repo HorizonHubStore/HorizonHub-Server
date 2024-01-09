@@ -1,8 +1,8 @@
 // api.test.ts
 
 import request from "supertest";
-import app, { server } from "../app";
-import { closeDB } from "../db/db";
+import app, {server} from "../app";
+import {closeDB} from "../db/db";
 
 let accessToken = "";
 
@@ -21,7 +21,7 @@ describe("API Tests", () => {
     it("should create a new post", async () => {
         const response = await request(app)
             .post("/post/createPost")
-            .set({ authorization: "JWT " + accessToken })
+            .set({authorization: "JWT " + accessToken})
             .field("name", "Test Post")
             .field("creatorUserId", "user123")
             .field("creatorName", "Test User")
@@ -38,8 +38,8 @@ describe("API Tests", () => {
     it("should update the name of an existing post", async () => {
         const response = await request(app)
             .put(`/post/update/${createdPostId}`)
-            .set({ authorization: "JWT " + accessToken })
-            .send({ name: "Updated Post Name" });
+            .set({authorization: "JWT " + accessToken})
+            .send({name: "Updated Post Name"});
 
         expect(response.statusCode).toEqual(200);
         expect(response.body).toHaveProperty("name", "Updated Post Name");
@@ -48,7 +48,7 @@ describe("API Tests", () => {
     it("should get all posts", async () => {
         const response = await request(app)
             .get("/post/getAllPosts")
-            .set({ authorization: "JWT " + accessToken });
+            .set({authorization: "JWT " + accessToken});
 
         expect(response.statusCode).toEqual(200);
     });
@@ -56,7 +56,7 @@ describe("API Tests", () => {
     it("should delete an existing post", async () => {
         const response = await request(app)
             .delete(`/post/delete/${createdPostId}`)
-            .set({ authorization: "JWT " + accessToken });
+            .set({authorization: "JWT " + accessToken});
 
         expect(response.statusCode).toEqual(200);
     });
