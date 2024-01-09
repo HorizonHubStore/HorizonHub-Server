@@ -58,8 +58,8 @@ describe("Token access", () => {
 
     it("Refresh token", async () => {
         const res = await request(app)
-            .get("/auth/refreashToken")
-            .set({authorization: "JWT " + accessToken + " " + refreashToken});
+            .get("/auth/refreshToken")
+            .set({authorization: "JWT " + accessToken + " " + refreshToken});
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
         newRefreshToken = res.body.refreshToken;
