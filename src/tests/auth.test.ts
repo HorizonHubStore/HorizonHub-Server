@@ -38,8 +38,8 @@ describe("Login", () => {
         accessToken = res.body.accessToken;
         refreshToken = res.body.refreshToken;
 
-        expect(accessToken).not.toEqual(null || undefined);
-        expect(refreshToken).not.toEqual(null || undefined);
+        expect(accessToken).not.toEqual(undefined);
+        expect(refreshToken).not.toEqual(undefined);
     });
 });
 
@@ -63,8 +63,8 @@ describe("Token access", () => {
         expect(res.statusCode).toEqual(200);
         newAccessToken = res.body.accessToken;
         newRefreshToken = res.body.refreshToken;
-        expect(newAccessToken).not.toEqual(null || undefined);
-        expect(newRefreshToken).not.toEqual(null || undefined);
+        expect(newAccessToken).not.toEqual(undefined);
+        expect(newRefreshToken).not.toEqual(undefined);
     });
 });
 
