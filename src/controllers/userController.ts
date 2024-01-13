@@ -11,7 +11,6 @@ export const updateUserPicture = async (req: Request, res: Response) => {
         // Retrieve the current user's data to get the old picture path
         const {userId} = req.body;
         const pictureName = req.file?.filename;
-
         // Construct the file paths
         const picturePath = `images/${pictureName}`;
         const currentUser = await User.findById(userId);
@@ -29,7 +28,7 @@ export const updateUserPicture = async (req: Request, res: Response) => {
             !oldPicturePath.includes("default-user-profile.jpg")
         ) {
             try {
-                await fs.unlink(oldPicturePath, (deleteError) => {
+                fs.unlink(oldPicturePath, (deleteError) => {
                     if (deleteError) {
                         console.error("Error deleting old file:", deleteError);
                     } else {

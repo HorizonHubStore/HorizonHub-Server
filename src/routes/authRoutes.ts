@@ -101,7 +101,47 @@ router.post('/googleLogin', authController.googleLogin);
  */
 router.post('/logout', authenticate, authController.logout);
 
-router.post('/refreshToken', authController.refreshToken)
+/**
+ * @openapi
+ * /auth/refreshToken:
+ *  post:
+ *    tags:
+ *     - Authentication
+ *    summary: Refresh access token
+ *    security:
+ *    - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              refreshToken:
+ *                type: string
+ *                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *    responses:
+ *      200:
+ *        description: Tokens refreshed successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                accessToken:
+ *                  type: string
+ *                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC..."
+ *                refreshToken:
+ *                  type: string
+ *                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *      400:
+ *        description: Bad request
+ *      401:
+ *        description: Unauthorized
+ *      403:
+ *        description: Forbidden
+ */
+router.post('/refreshToken', authController.refreshToken);
 
 
 export default router;

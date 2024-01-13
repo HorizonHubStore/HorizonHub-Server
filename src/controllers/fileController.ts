@@ -28,7 +28,7 @@ const uploadPostFiles = multer({storage: storage}).fields(postFields);
 
 const deleteFile = async (filePath: string) => {
     try {
-        await fs.unlink(filePath, (deleteError) => {
+        fs.unlink(filePath, (deleteError) => {
             if (deleteError) {
                 console.error("Error deleting old file:", deleteError);
             } else {

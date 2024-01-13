@@ -125,8 +125,6 @@ async function refreshToken(req: Request, res: Response) {
 
     jwt.verify(token, refreshTokenSecret, async (err, userInfo) => {
         if (err) {
-            console.log('a');
-
             return res.status(403).send(err.message);
         }
 
