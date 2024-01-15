@@ -89,6 +89,15 @@ router.get("/getAllPosts", authenticate, postController.getAllPosts);
  *        required: true
  *        schema:
  *          type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
  *    responses:
  *      200:
  *        description: Post updated successfully
