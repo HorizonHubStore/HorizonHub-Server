@@ -1,55 +1,5 @@
 import mongoose, {Document, Schema} from "mongoose";
 
-/**
- * @openapi
- * components:
- *  schemas:
- *    CreateUserInput:
- *      type: object
- *      required:
- *        - username
- *        - password
- *        - fullName
- *      properties:
- *        username:
- *          type: string
- *          default: JaneDoe
- *        password:
- *          type: string
- *          default: stringPassword123
- *        fullName:
- *          type: string
- *          default: Jane Doe
- *    CreateUserResponse:
- *      type: object
- *      properties:
- *        username:
- *          type: string
- *        password:
- *          type: string
- *        fullName:
- *          type: string
- *    LoginUserInput:
- *      type: object
- *      required:
- *        - username
- *        - password
- *      properties:
- *        username:
- *          type: string
- *          default: JaneDoe
- *        password:
- *          type: string
- *          default: stringPassword123
- *    LoginUserResponse:
- *      type: object
- *      properties:
- *        username:
- *          type: string
- *        password:
- *          type: string
- */
-
 export interface IUser extends Document {
     username: string;
     password: string;

@@ -30,14 +30,31 @@ router.get('/healthcheck', (req, res) => res.sendStatus(200));
  *      content:
  *        application/json:
  *           schema:
- *              $ref: '#/components/schemas/CreateUserInput'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: JaneDoe
+ *               password:
+ *                 type: string
+ *                 example: stringPassword123
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
  *     responses:
  *      200:
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/CreateUserResponse'
+ *             type: object
+ *             properties:
+ *                 username:
+ *                   type: string
+ *                 password:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
  *      409:
  *        description: Conflict
  *      400:
@@ -57,14 +74,26 @@ router.post('/signup', authController.signup);
  *      content:
  *        application/json:
  *           schema:
- *              $ref: '#/components/schemas/LoginUserInput'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: JaneDoe
+ *               password:
+ *                 type: string
+ *                 example: stringPassword123
  *     responses:
  *      200:
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/LoginUserResponse'
+ *             type: object
+ *             properties:
+ *                 username:
+ *                   type: string
+ *                 password:
+ *                   type: string
  *      409:
  *        description: Conflict
  *      400:
