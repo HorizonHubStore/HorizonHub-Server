@@ -1,10 +1,10 @@
-FROM nginx:stable-alpine as production-stage
+FROM node:16-alpine as production-stage
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 COPY public ./public
-COPY dist ./dist
+COPY dist .
 
 ENV ACCESS_TOKEN_SECRET=e13048fb3eea6566...
 ENV REFRESH_TOKEN_SECRET=32bb06efbfe7c626...
@@ -13,4 +13,4 @@ ENV MONGO_URI=mongodb+srv://user:6r05oqyPbkLNBUnX@cluster0.ru6kdim.mongodb.net/
 
 EXPOSE 80
 
-CMD ["node", "dist/src/app.js"]
+CMD ["node", "src/app.js"]
