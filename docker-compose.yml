@@ -1,14 +1,16 @@
 version: '3.9'
 services:
-  frontend:
+  client:
     container_name: horizon-hub-client
+    image: horizon-hub-client
     build:
       context: ../HorizonHub-Client
     ports:
       - "4000:80"
     restart: on-failure
-  backend:
+  server:
     container_name: horizon-hub-server
+    image: horizon-hub-server
     build:
       context: .
     ports:
